@@ -4,10 +4,10 @@ import { Person, MainCategory, SubCategory } from './types';
 import ProfileModal from './components/ProfileModal';
 import { 
   Search, Hash, Plus, Home, Heart, User, 
-  Trash2, MoreHorizontal, Compass, Camera, Zap, RefreshCw, Database, Feather, Image as ImageIcon
+  Trash2, MoreHorizontal, Compass, Camera, Zap, RefreshCw, Database, Feather, Image as ImageIcon, Instagram
 } from 'lucide-react';
 
-const DB_KEY = 'muse_archive_db_v1';
+const DB_KEY = 'muse_archive_db_v2'; // Bump version for schema change
 
 const App: React.FC = () => {
   // --- State ---
@@ -34,7 +34,7 @@ const App: React.FC = () => {
   const [newMuseName, setNewMuseName] = useState('');
   const [newMuseImage, setNewMuseImage] = useState<string | null>(null);
   const [newMuseCategory, setNewMuseCategory] = useState<MainCategory>(MainCategory.CELEBRITY);
-  const [newMuseSubCategory, setNewMuseSubCategory] = useState<SubCategory>(SubCategory.ACTOR);
+  const [newMuseSubCategory, setNewMuseSubCategory] = useState<SubCategory>(SubCategory.KPOP_GROUP);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,7 +59,7 @@ const App: React.FC = () => {
             const newPhotoUrl = `https://picsum.photos/seed/${Date.now()}/800/1000`;
             const updatedMuse = {
               ...randomMuse,
-              galleryImages: [newPhotoUrl, ...randomMuse.galleryImages]
+              galleryImages: [{ url: newPhotoUrl, likes: 0, comments: 0 }, ...randomMuse.galleryImages]
             };
             const newMuses = [...currentMuses];
             newMuses[randomMuseIndex] = updatedMuse;
@@ -82,7 +82,7 @@ const App: React.FC = () => {
 
   const handleDeleteMuse = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm('Remove this muse from your archive?')) {
+    if (window.confirm('정말 이 뮤즈를 아카이브에서 삭제하시겠습니까?')) {
       setMuses(prev => prev.filter(p => p.id !== id));
       if (selectedPerson?.id === id) setSelectedPerson(null);
     }
@@ -110,10 +110,10 @@ const App: React.FC = () => {
       subCategory: newMuseSubCategory,
       mainImage: newMuseImage,
       galleryImages: [],
-      tags: ['New', 'Trending'],
+      tags: ['NEW', '유망주'],
       info: {
-        birthdate: 'Unknown',
-        description: 'A new muse added to the collection.',
+        birthdate: '미상',
+        description: '아카이브에 새로 추가된 뮤즈입니다.',
         mbti: '????'
       }
     };
@@ -133,7 +133,7 @@ const App: React.FC = () => {
   };
 
   const resetDatabase = () => {
-    if(window.confirm('Are you sure you want to reset the database? This will revert to default data.')) {
+    if(window.confirm('데이터베이스를 초기화하시겠습니까? 모든 변경사항이 사라지고 기본 데이터로 복구됩니다.')) {
         localStorage.removeItem(DB_KEY);
         setMuses(MOCK_PEOPLE);
         window.location.reload();
@@ -154,9 +154,9 @@ const App: React.FC = () => {
         
         <nav className="flex-1 space-y-2 w-full">
           {[
-            { id: 'home', icon: Home, label: 'Home' },
-            { id: 'explore', icon: Hash, label: 'Explore' },
-            { id: 'favorites', icon: Heart, label: 'Favorites' },
+            { id: 'home', icon: Home, label: '홈' },
+            { id: 'explore', icon: Hash, label: '탐색' },
+            { id: 'favorites', icon: Heart, label: '즐겨찾기' },
           ].map((item) => (
              <button 
                key={item.id}
@@ -176,7 +176,7 @@ const App: React.FC = () => {
             className="mt-8 bg-twitter-blue hover:bg-blue-600 text-white rounded-full p-4 xl:w-full xl:py-3 transition-colors flex items-center justify-center shadow-lg shadow-blue-900/20"
           >
              <Feather size={24} className="xl:hidden" />
-             <span className="hidden xl:block font-bold text-lg">New Muse</span>
+             <span className="hidden xl:block font-bold text-lg">새 뮤즈 등록</span>
           </button>
         </nav>
 
@@ -192,8 +192,8 @@ const App: React.FC = () => {
                  {isAutoSyncing && <div className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full animate-ping" />}
                </div>
                <div className="hidden xl:block">
-                  <p className="font-bold text-sm">Live Sync</p>
-                  <p className="text-xs text-twitter-textDim">{isAutoSyncing ? 'Active' : 'Paused'}</p>
+                  <p className="font-bold text-sm">실시간 동기화</p>
+                  <p className="text-xs text-twitter-textDim">{isAutoSyncing ? '켜짐' : '일시정지'}</p>
                </div>
             </div>
 
@@ -203,7 +203,7 @@ const App: React.FC = () => {
               className="flex items-center gap-3 p-3 rounded-full hover:bg-red-900/20 cursor-pointer w-full transition-colors text-twitter-textDim hover:text-red-500"
             >
                <Database size={24} />
-               <span className="hidden xl:block font-medium text-sm">Reset DB</span>
+               <span className="hidden xl:block font-medium text-sm">DB 초기화</span>
             </div>
         </div>
       </aside>
@@ -213,10 +213,10 @@ const App: React.FC = () => {
         
         {/* Header (Glassmorphism) */}
         <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-twitter-border px-4 py-3 flex justify-between items-center">
-           <h1 className="font-bold text-xl">Home</h1>
+           <h1 className="font-bold text-xl">홈</h1>
            <div className="flex gap-2">
               <span className="text-xs font-mono text-twitter-textDim border border-twitter-border px-2 py-1 rounded">
-                {filteredPeople.length} ARCHIVED
+                {filteredPeople.length}명 보관 중
               </span>
            </div>
         </div>
@@ -225,9 +225,9 @@ const App: React.FC = () => {
         <div className="border-b border-twitter-border">
           <div className="flex">
             {[
-              { id: 'ALL', label: 'For You' },
-              { id: MainCategory.CELEBRITY, label: 'Celebrities' },
-              { id: MainCategory.INFLUENCER, label: 'Influencers' }
+              { id: 'ALL', label: '전체' },
+              { id: MainCategory.CELEBRITY, label: '연예인' },
+              { id: MainCategory.INFLUENCER, label: '인플루언서' }
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -249,7 +249,7 @@ const App: React.FC = () => {
         {isAutoSyncing && lastUpdated && (
            <div className="py-2 border-b border-twitter-border bg-twitter-blue/5 flex justify-center items-center gap-2">
               <span className="text-xs text-twitter-blue font-mono">
-                Incoming sync detected • {lastUpdated}
+                새로운 업데이트 감지됨 • {lastUpdated}
               </span>
            </div>
         )}
@@ -282,12 +282,27 @@ const App: React.FC = () => {
                           <h3 className="font-bold text-white text-base leading-tight">{person.name}</h3>
                           <p className="text-xs text-twitter-textDim mt-0.5">{person.groupName || person.subCategory}</p>
                         </div>
-                        <button 
-                           onClick={(e) => handleDeleteMuse(e, person.id)}
-                           className="text-twitter-textDim hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                           <Trash2 size={14} />
-                        </button>
+                        <div className="flex gap-1">
+                           {/* Instagram Direct Link on Card */}
+                           {person.instagramUrl && (
+                             <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(person.instagramUrl, '_blank');
+                                }}
+                                className="p-1.5 text-twitter-textDim hover:text-pink-500 hover:bg-pink-500/10 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                                title="인스타그램 바로가기"
+                             >
+                                <Instagram size={16} />
+                             </button>
+                           )}
+                           <button 
+                              onClick={(e) => handleDeleteMuse(e, person.id)}
+                              className="p-1.5 text-twitter-textDim hover:text-red-500 hover:bg-red-500/10 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                           >
+                              <Trash2 size={16} />
+                           </button>
+                        </div>
                      </div>
                      
                      <div className="mt-3 flex flex-wrap gap-1">
@@ -307,8 +322,8 @@ const App: React.FC = () => {
                <div className="w-16 h-16 bg-twitter-gray rounded-full flex items-center justify-center mb-4">
                   <Compass size={32} />
                </div>
-               <p className="text-lg font-bold text-white">No muses found.</p>
-               <p className="text-sm">Try adding one or changing filters.</p>
+               <p className="text-lg font-bold text-white">등록된 뮤즈가 없습니다.</p>
+               <p className="text-sm">우측 하단의 버튼을 눌러 추가해보세요.</p>
             </div>
           )}
         </div>
@@ -322,18 +337,18 @@ const App: React.FC = () => {
                <Search size={18} className="text-twitter-textDim" />
                <input 
                  type="text" 
-                 placeholder="Search Archive" 
+                 placeholder="아카이브 검색" 
                  className="bg-transparent border-none outline-none text-white ml-3 w-full placeholder-twitter-textDim"
                />
             </div>
 
             <div className="bg-twitter-gray rounded-2xl p-4 border border-twitter-border">
-               <h2 className="font-bold text-xl mb-4">Trending Tags</h2>
+               <h2 className="font-bold text-xl mb-4">인기 태그</h2>
                <div className="space-y-4">
-                  {['#KPOP', '#Visual', '#Aesthetic', '#OOTD', '#Vibes'].map((tag, i) => (
+                  {['#KPOP', '#비주얼', '#입덕', '#직캠', '#분위기'].map((tag, i) => (
                     <div key={i} className="flex justify-between items-center cursor-pointer hover:bg-white/5 p-2 rounded-lg -mx-2 transition-colors">
                        <div>
-                          <p className="text-xs text-twitter-textDim">Trending in Archive</p>
+                          <p className="text-xs text-twitter-textDim">실시간 트렌드</p>
                           <p className="font-bold">{tag}</p>
                        </div>
                        <MoreHorizontal size={16} className="text-twitter-textDim" />
@@ -369,13 +384,13 @@ const App: React.FC = () => {
           <div className="bg-black w-full max-w-lg rounded-2xl border border-twitter-border overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-3 border-b border-twitter-border flex justify-between items-center">
                <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-twitter-gray rounded-full transition-colors"><X/></button>
-               <span className="font-bold">New Entry</span>
+               <span className="font-bold">새 기록 추가</span>
                <button 
                 onClick={handleCreateMuse}
                 disabled={!newMuseName || !newMuseImage}
                 className="bg-white text-black px-4 py-1.5 rounded-full font-bold text-sm disabled:opacity-50 hover:bg-gray-200 transition-colors"
                >
-                 Post
+                 게시하기
                </button>
             </div>
             
@@ -390,7 +405,7 @@ const App: React.FC = () => {
                        value={newMuseName}
                        onChange={(e) => setNewMuseName(e.target.value)}
                        className="w-full bg-transparent text-xl placeholder-twitter-textDim outline-none"
-                       placeholder="Who is this muse?"
+                       placeholder="이 뮤즈는 누구인가요?"
                      />
 
                      <div className="grid grid-cols-2 gap-3">
@@ -419,7 +434,7 @@ const App: React.FC = () => {
                           <img src={newMuseImage} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
                           <div className="flex items-center gap-2 text-twitter-blue font-bold">
-                             <ImageIcon size={20} /> Add Media
+                             <ImageIcon size={20} /> 사진 추가
                           </div>
                         )}
                         <input 

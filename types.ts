@@ -1,19 +1,19 @@
 export enum MainCategory {
-  CELEBRITY = 'Celebrity',
-  INFLUENCER = 'Influencer'
+  CELEBRITY = '연예인',
+  INFLUENCER = '인플루언서'
 }
 
 export enum SubCategory {
   // Celebrity types
-  KPOP_GROUP = 'K-Pop Group',
-  ACTOR = 'Actor',
-  SOLO_ARTIST = 'Solo Artist',
+  KPOP_GROUP = 'K-POP 그룹',
+  ACTOR = '배우',
+  SOLO_ARTIST = '솔로 가수',
   
   // Influencer types
-  YOUTUBE = 'YouTube',
-  INSTAGRAM = 'Instagram',
-  TWITCH = 'Twitch',
-  TIKTOK = 'TikTok'
+  YOUTUBE = '유튜브',
+  INSTAGRAM = '인스타그램',
+  TWITCH = '트위치',
+  TIKTOK = '틱톡'
 }
 
 export interface PersonInfo {
@@ -24,6 +24,12 @@ export interface PersonInfo {
   description: string;
 }
 
+export interface GalleryItem {
+  url: string;
+  likes: number;
+  comments: number;
+}
+
 export interface Person {
   id: string;
   name: string;
@@ -32,7 +38,7 @@ export interface Person {
   groupName?: string; // Specific group name if applicable (e.g., "NewJeans")
   platformName?: string; // Channel name if applicable
   mainImage: string;
-  galleryImages: string[];
+  galleryImages: GalleryItem[];
   tags: string[];
   info: PersonInfo;
   instagramUrl?: string; // Specific official Instagram link
