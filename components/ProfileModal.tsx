@@ -4,7 +4,7 @@ import { generateCharmAnalysis } from '../services/geminiService';
 import { 
   X, Sparkles, Image as ImageIcon, Trash2, Plus, 
   ArrowLeft, MoreHorizontal, Globe, Link as LinkIcon, 
-  MapPin, Calendar, CheckBadge, MessageSquare
+  MapPin, Calendar, BadgeCheck, MessageSquare
 } from 'lucide-react';
 
 interface ProfileModalProps {
@@ -91,7 +91,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ person, onClose, onUpdatePe
           </button>
           <div className="flex flex-col">
              <h2 className="font-bold text-lg leading-tight flex items-center gap-1">
-               {person.name} <CheckBadge size={16} className="text-twitter-blue fill-twitter-blue text-black" />
+               {person.name} <BadgeCheck size={16} className="text-twitter-blue fill-twitter-blue text-black" />
              </h2>
              <span className="text-xs text-twitter-textDim">{person.galleryImages.length} Photos</span>
           </div>
@@ -272,7 +272,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ person, onClose, onUpdatePe
                          <div className="flex-1">
                             <h3 className="font-bold text-white flex items-center gap-1">
                               {source.name}
-                              {source.official && <CheckBadge size={14} className="text-twitter-blue fill-twitter-blue text-black" />}
+                              {source.official && <BadgeCheck size={14} className="text-twitter-blue fill-twitter-blue text-black" />}
                             </h3>
                             <p className="text-xs text-twitter-textDim truncate">{source.url}</p>
                          </div>
