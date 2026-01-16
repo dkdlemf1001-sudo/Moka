@@ -4,10 +4,10 @@ import { Person, MainCategory, SubCategory } from './types';
 import ProfileModal from './components/ProfileModal';
 import { 
   Search, Hash, Plus, Home, Heart, User, 
-  Trash2, MoreHorizontal, Compass, Camera, Zap, RefreshCw, Database, Feather, Image as ImageIcon, Instagram
+  Trash2, MoreHorizontal, Compass, Camera, Zap, RefreshCw, Database, Feather, Image as ImageIcon, Instagram, Link as LinkIcon
 } from 'lucide-react';
 
-const DB_KEY = 'muse_archive_db_v2'; // Bump version for schema change
+const DB_KEY = 'muse_archive_db_v3'; // Bump version
 
 const App: React.FC = () => {
   // --- State ---
@@ -35,6 +35,7 @@ const App: React.FC = () => {
   const [newMuseImage, setNewMuseImage] = useState<string | null>(null);
   const [newMuseCategory, setNewMuseCategory] = useState<MainCategory>(MainCategory.CELEBRITY);
   const [newMuseSubCategory, setNewMuseSubCategory] = useState<SubCategory>(SubCategory.KPOP_GROUP);
+  const [newMuseLink, setNewMuseLink] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,7 +60,7 @@ const App: React.FC = () => {
             const newPhotoUrl = `https://picsum.photos/seed/${Date.now()}/800/1000`;
             const updatedMuse = {
               ...randomMuse,
-              galleryImages: [{ url: newPhotoUrl, likes: 0, comments: 0 }, ...randomMuse.galleryImages]
+              galleryImages: [{ url: newPhotoUrl, likes: Math.floor(Math.random() * 5000), comments: Math.floor(Math.random() * 100) }, ...randomMuse.galleryImages]
             };
             const newMuses = [...currentMuses];
             newMuses[randomMuseIndex] = updatedMuse;
@@ -103,17 +104,31 @@ const App: React.FC = () => {
   const handleCreateMuse = () => {
     if (!newMuseName || !newMuseImage) return;
 
+    // Simulate "Extraction" from link if provided
+    const initialGallery = [];
+    if (newMuseLink) {
+       // Add some placeholder images to simulate fetching from the link
+       for(let i=0; i<4; i++) {
+         initialGallery.push({
+           url: `https://picsum.photos/seed/${newMuseName}-${i}/800/800`,
+           likes: Math.floor(Math.random() * 10000),
+           comments: Math.floor(Math.random() * 500)
+         });
+       }
+    }
+
     const newPerson: Person = {
       id: Date.now().toString(),
       name: newMuseName,
       mainCategory: newMuseCategory,
       subCategory: newMuseSubCategory,
       mainImage: newMuseImage,
-      galleryImages: [],
-      tags: ['NEW', '유망주'],
+      galleryImages: initialGallery,
+      tags: ['NEW', '업데이트필요'],
+      instagramUrl: newMuseLink || undefined,
       info: {
         birthdate: '미상',
-        description: '아카이브에 새로 추가된 뮤즈입니다.',
+        description: newMuseLink ? 'SNS 링크에서 데이터를 가져왔습니다.' : '아카이브에 새로 추가된 뮤즈입니다.',
         mbti: '????'
       }
     };
@@ -126,6 +141,7 @@ const App: React.FC = () => {
   const resetForm = () => {
     setNewMuseName('');
     setNewMuseImage(null);
+    setNewMuseLink('');
   };
 
   const toggleAutoSync = () => {
@@ -423,6 +439,18 @@ const App: React.FC = () => {
                         >
                           {Object.values(SubCategory).map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
+                     </div>
+
+                     {/* SNS Link Input */}
+                     <div className="flex items-center gap-2 bg-twitter-gray rounded-lg px-3 py-2 border border-transparent focus-within:border-twitter-blue transition-colors">
+                        <LinkIcon size={16} className="text-twitter-textDim" />
+                        <input 
+                          type="text"
+                          value={newMuseLink}
+                          onChange={(e) => setNewMuseLink(e.target.value)}
+                          className="bg-transparent text-sm w-full outline-none placeholder-twitter-textDim"
+                          placeholder="인스타그램/유튜브 링크 (자동 피드 생성)"
+                        />
                      </div>
                      
                      {/* Image Preview Area */}
